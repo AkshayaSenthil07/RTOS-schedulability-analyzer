@@ -1,3 +1,4 @@
+
 from dataclasses import dataclass, field
 
 from engine.tasks import Task
@@ -7,6 +8,8 @@ from engine.tasks import Task
 class Job:
     """
     Represents one released instance of a periodic task.
+
+    All time values are expressed in microseconds (µs).
     """
 
     task: Task
@@ -18,13 +21,18 @@ class Job:
 
     def __post_init__(self):
 
+        if not isinstance(self.job_id, int) or isinstance(self.job_id, bool):
+            raise ValueError("Job ID must be an integer")
+
         if self.job_id <= 0:
             raise ValueError("Job ID must be positive")
+
+        if not isinstance(self.release_time, int) or isinstance(self.release_time, bool):
+            raise ValueError("Release time must be an integer")
 
         if self.release_time < 0:
             raise ValueError("Release time cannot be negative")
 
-        # A new job initially needs the task's full execution time.
         self.remaining_execution = self.task.C
 
     @property
